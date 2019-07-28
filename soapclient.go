@@ -111,7 +111,7 @@ func (client *SoapClient) Fetch(result interface{}) error {
 		return fmt.Errorf("Parse error: %s", err.Error())
 	}
 
-	request.Header.Set("Content-type", "text/xml; charset=\"UTF-8\"")
+	request.Header.Set("Content-Type", `text/xml; charset="UTF-8"`)
 
 	if client.soapAction != "" {
 		request.Header.Set("SOAPAction", client.soapAction)
