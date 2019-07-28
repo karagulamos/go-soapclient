@@ -2,6 +2,7 @@ package soapclient
 
 import (
 	"bytes"
+	"encoding/base64"
 	"encoding/xml"
 	"fmt"
 	"net/http"
@@ -85,7 +86,13 @@ func (client *SoapClient) WithAction(soapAction string) *SoapClient {
 	return client
 }
 
-// SetHeader sets or adds a header to the request
+// SetBasicAuth sets up the client to use Basic Auth
+func (client *SoapClient) SetBasicAuth(username, password string) {
+	auth := base64.StdEncoding.EncodeToString([]byte(username + ":" + password))
+	client.headers["Authorization"] = "Basic " + auth
+}
+
+// SetHeader sets the request header
 func (client *SoapClient) SetHeader(key, value string) {
 	client.headers[key] = value
 }
@@ -111,7 +118,7 @@ func (client *SoapClient) Fetch(result interface{}) error {
 	}
 
 	for key, value := range client.headers {
-		request.Header.Set(key, value)
+		request.Header.Add(key, value)
 	}
 
 	response, err := client.httpclient.Do(request)
