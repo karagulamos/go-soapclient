@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/karagulamos/soapclient/httpclient"
+	"github.com/karagulamos/SoapClient/httpclient"
 	"golang.org/x/net/html/charset"
 )
 
@@ -27,7 +27,8 @@ func (s *soapRequestEnvelope) Serialize() ([]byte, error) {
 	return payload, nil
 }
 
-type soapClient struct {
+// SoapClient used to handle SOAP requests
+type SoapClient struct {
 	httpMethod string
 	url        string
 	soapAction string
@@ -39,8 +40,8 @@ type soapClient struct {
 }
 
 // NewSoapClient creates a new instance of the SOAP client
-func NewSoapClient(httpclient httpclient.HTTPClient, httpMethod, url, soapAction string) *soapClient {
-	client := new(soapClient)
+func NewSoapClient(httpclient httpclient.HTTPClient, httpMethod, url, soapAction string) *SoapClient {
+	client := new(SoapClient)
 
 	client.httpMethod = httpMethod
 	client.url = url
@@ -54,7 +55,7 @@ func NewSoapClient(httpclient httpclient.HTTPClient, httpMethod, url, soapAction
 
 // MakePOST creates a SOAP client instance for POST requests.
 //          It takes a url and soapAction as arguments.
-func MakePOST(url string, client ...httpclient.HTTPClient) *soapClient {
+func MakePOST(url string, client ...httpclient.HTTPClient) *SoapClient {
 	if len(client) > 0 {
 		return NewSoapClient(client[0], "POST", url, "")
 	}
@@ -64,7 +65,7 @@ func MakePOST(url string, client ...httpclient.HTTPClient) *soapClient {
 
 // MakeGET creates a SOAP client instance for GET requests.
 //          It takes a url and soapAction as arguments.
-func MakeGET(url string, client ...httpclient.HTTPClient) *soapClient {
+func MakeGET(url string, client ...httpclient.HTTPClient) *SoapClient {
 	if len(client) > 0 {
 		return NewSoapClient(client[0], "GET", url, "")
 	}
@@ -73,24 +74,24 @@ func MakeGET(url string, client ...httpclient.HTTPClient) *soapClient {
 }
 
 // WithRequest accepts the request payload
-func (client *soapClient) WithRequest(request interface{}) *soapClient {
+func (client *SoapClient) WithRequest(request interface{}) *SoapClient {
 	client.envelope.Body.Request = request
 	return client
 }
 
 // WithAction accepts the soap action for the request
-func (client *soapClient) WithAction(soapAction string) *soapClient {
+func (client *SoapClient) WithAction(soapAction string) *SoapClient {
 	client.soapAction = soapAction
 	return client
 }
 
-// WithRequest sets or adds a header to the request
-func (client *soapClient) SetHeader(key, value string) {
+// SetHeader sets or adds a header to the request
+func (client *SoapClient) SetHeader(key, value string) {
 	client.headers[key] = value
 }
 
 // Fetch executes the SOAP requests and fetches the result
-func (client *soapClient) Fetch(result interface{}) error {
+func (client *SoapClient) Fetch(result interface{}) error {
 	payload, err := client.envelope.Serialize()
 
 	if err != nil {
